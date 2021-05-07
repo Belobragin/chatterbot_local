@@ -2,6 +2,14 @@
 ChatterBot utility functions
 """
 from nltk.corpus import wordnet
+import os
+
+#############################################################
+#this constant to point to the folder with nltk_data
+NLTK_DIR = 'nltk_data'
+#this constant to define local_data (False by default):
+LOCAL_DATA = True
+##############################################################
 
 
 def import_module(dotted_path):
@@ -84,15 +92,27 @@ def validate_adapter_class(validate_class, adapter_class):
         )
 
 
-def nltk_download_corpus(resource_path):
+def nltk_download_corpus(resource_path, 
+                        local_data = LOCAL_DATA,
+                        nltk_dir = NLTK_DIR,
+                        ):
     """
     Download the specified NLTK corpus file
     unless it has already been downloaded.
 
     Returns True if the corpus needed to be downloaded.
     """
+    print(os.getcwd())
     from nltk.data import find
-    from nltk import download
+    if not(local_data):
+        from nltk import download
+    else:
+        from nltk.downloader import Downloader
+        _downloader = Downloader(local_data = local_data,
+                                nltk_dir = nltk_dir)
+        #print(os.listdir(_downloader._download_dir)) DEBUG, don't throw away
+        download = _downloader.download
+
     from os.path import split, sep
     from zipfile import BadZipfile
 
@@ -187,7 +207,7 @@ def download_nltk_stopwords():
     """
     Download required NLTK stopwords corpus if it has not already been downloaded.
     """
-    nltk_download_corpus('stopwords')
+    nltk_download_corpus('corpora/stopwords')
 
 
 def download_nltk_wordnet():
